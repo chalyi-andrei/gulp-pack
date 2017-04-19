@@ -8,13 +8,19 @@ var gulp         = require('gulp'),
 	imagemin     = require('gulp-imagemin'),
 	pngquant     = require('imagemin-pngquant'),
 	cache        = require('gulp-cache'),
-	autoprefixer = require('gulp-autoprefixer'); 
+	autoprefixer = require('gulp-autoprefixer'),
+	gulp         = require('gulp'),
+	babel        = require('gulp-babel'),
+    notify       = require('gulp-notify');
 
 // Tasks 
 
 gulp.task('sass', function() {
 	return  gulp.src('scss/**/*.scss')
-			.pipe(sass())
+            .pipe(sass().on('error', notify.onError({
+                message: '<%= error.message%>',
+                title: 'Sass Error!'
+            })))
 			.pipe(autoprefixer(['last 15 version', '>1%', 'ie 8', 'ie 7'], {cascade:true}))
 			.pipe(gulp.dest('src/css'))
 });
@@ -32,6 +38,7 @@ gulp.task('style-min', function() {
 
 gulp.task('scripts',function() {
 	return gulp.src(['src/js/**/*.js'])
+		.pipe(babel({presets: ['es2015']}))
 		.pipe(uglify())
 		.pipe(rename({suffix: '.min'}))
 		.pipe(gulp.dest('js'));
